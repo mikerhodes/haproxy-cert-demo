@@ -1,14 +1,19 @@
 # Mutual certificate authentication using HAProxy sidecars
 
-This repo shows how to use HAProxy as a sidecar that runs alongside your main
-application. The sidecar HAProxy implements mutual TLS authentication using
-certificates that share a Certficate Authority. Both client and server sides
-of the HAProxy connection present certificates for verification.
+This repository shows how to use HAProxy to create a secure (encrypted and
+authenticated) channel between two applications that don't support secure
+communication themselves. It uses HAProxy as a "sidecar" at each end of a
+client/server connection. The client connects to its local HAProxy, which
+connects to the server's HAProxy sidecar, which connects to the server.
 
-Broadly this shows how HAProxy may be used as a proxy to upgrade the connection
-between two applications to a TLS connection with mutual authentication. In
-particular this is useful to tunnel otherwise non-TLS capable clients over a
-secured, authenticated channel.
+The client -> HAProxy and HAProxy -> server connections are unencrypted as they
+are assumed to be machine-local. The client and server HAProxy instances use
+a shared Certificate Authority (CA) to trust certificates that they present
+to each other when making the connection.
+
+As a reference point, this is essentially what tools like Istio and Linkerd
+do to create secure channels between pods in Kubernetes -- create a proxy which
+has its own certificate signed by a shared CA.
 
 The main files are:
 

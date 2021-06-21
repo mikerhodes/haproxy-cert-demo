@@ -1,6 +1,7 @@
 # Mutual certificate authentication using HAProxy sidecars
 
-This repository shows how to use HAProxy to create a secure (encrypted and
+This repository is meant to demonstrate the concept of using a proxy to create a
+secure channel. It shows how to use HAProxy to create a secure (encrypted and
 authenticated) channel between two applications that don't support secure
 communication themselves. It uses HAProxy as a "sidecar" at each end of a
 client/server connection. The client connects to its local HAProxy, which
@@ -13,7 +14,9 @@ to each other when making the connection.
 
 As a reference point, this is essentially what tools like Istio and Linkerd
 do to create secure channels between pods in Kubernetes -- create a proxy which
-has its own certificate signed by a shared CA.
+has its own certificate signed by a shared CA. In addition, other proxies like
+Envoy and Nginx can easily be used in place of HAProxy; I just happen to know
+HAProxy best.
 
 The main files are:
 

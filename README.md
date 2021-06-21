@@ -24,14 +24,19 @@ The main files are:
     with the signing keys and certificates for the client and server HAProxy
     instances to use.
 
-The setup is:
+The (imagined) setup is:
 
 ```
-┌────────┐      ┌────────────┐        ┌────────────┐      ┌───────┐
-│ go     │:8080 │            │:8081   │            │:3000 │go     │
-│ client ├─────►│client-proxy├───────►│server-proxy├─────►│server │
-│        │      │            │secure  │            │      │       │
-└────────┘      └────────────┘channel └────────────┘      └───────┘
+┌───────────────────────────────┐           ┌──────────────────────────────┐
+│                               │           │                              │
+│ ┌────────┐      ┌────────────┬┤           ├┬────────────┐      ┌───────┐ │
+│ │ go     │:8080 │            ││  :8081    ││            │:3000 │go     │ │
+│ │ client ├─────►│client-proxy│┼───────────┼│server-proxy├─────►│server │ │
+│ │        │      │            ││  secure   ││            │      │       │ │
+│ └────────┘      └────────────┴┤  TLS 1.3+ ├┴────────────┘      └───────┘ │
+│                               │  channel  │                              │
+│           node 1              │           │            node 2            │
+└───────────────────────────────┘           └──────────────────────────────┘
 ```
 
 ## Getting started

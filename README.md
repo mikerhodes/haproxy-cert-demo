@@ -4,19 +4,34 @@ This repository is meant to demonstrate the concept of using a proxy to create a
 secure channel. It shows how to use HAProxy to create a secure (encrypted and
 authenticated) channel between two applications that don't support secure
 communication themselves. It uses HAProxy as a "sidecar" at each end of a
-client/server connection. The client connects to its local HAProxy, which
-connects to the server's HAProxy sidecar, which connects to the server.
+client/server connection. You might use such a setup when you don't fully trust
+the underlying network layer, such as over the internet or when using a cloud
+provider. The client connects to its local HAProxy, which (securely) connects to
+the server's HAProxy sidecar, which connects to the server:
 
-The client -> HAProxy and HAProxy -> server connections are unencrypted as they
-are assumed to be machine-local. The client and server HAProxy instances use
-a shared Certificate Authority (CA) to trust certificates that they present
-to each other when making the connection.
+```
+┌───────────────────────────────┐           ┌──────────────────────────────┐
+│                               │           │                              │
+│ ┌────────┐      ┌────────────┬┤           ├┬────────────┐      ┌───────┐ │
+│ │ go     │:8080 │            ││  :8081    ││            │:3000 │go     │ │
+│ │ client ├─────►│client-proxy│┼───────────┼│server-proxy├─────►│server │ │
+│ │        │      │            ││  secure   ││            │      │       │ │
+│ └────────┘      └────────────┴┤  TLS 1.3+ ├┴────────────┘      └───────┘ │
+│                               │  channel  │                              │
+│           node 1              │           │            node 2            │
+└───────────────────────────────┘           └──────────────────────────────┘
+```
 
-As a reference point, this is essentially what tools like Istio and Linkerd
-do to create secure channels between pods in Kubernetes -- create a proxy which
-has its own certificate signed by a shared CA. In addition, other proxies like
-Envoy and Nginx can easily be used in place of HAProxy; I just happen to know
-HAProxy best.
+The `client -> HAProxy` and `HAProxy -> server` connections are unencrypted as
+they are assumed to be machine-local, and so secure. The client and server
+HAProxy instances use a shared Certificate Authority (CA) to trust certificates
+that they present to each other when making the connection.
+
+As a reference point, this is essentially what tools like Istio and Linkerd do
+to create secure channels between pods in Kubernetes -- create a proxy within
+each pod which has its own certificate signed by a shared CA. In addition, other
+proxies like Envoy and Nginx can easily be used in place of HAProxy; I just
+happen to know HAProxy best.
 
 The main files are:
 
@@ -31,21 +46,6 @@ The main files are:
     to generate a Certificate Authority (CA) signing key and certificate, along
     with the signing keys and certificates for the client and server HAProxy
     instances to use.
-
-The (imagined) setup is:
-
-```
-┌───────────────────────────────┐           ┌──────────────────────────────┐
-│                               │           │                              │
-│ ┌────────┐      ┌────────────┬┤           ├┬────────────┐      ┌───────┐ │
-│ │ go     │:8080 │            ││  :8081    ││            │:3000 │go     │ │
-│ │ client ├─────►│client-proxy│┼───────────┼│server-proxy├─────►│server │ │
-│ │        │      │            ││  secure   ││            │      │       │ │
-│ └────────┘      └────────────┴┤  TLS 1.3+ ├┴────────────┘      └───────┘ │
-│                               │  channel  │                              │
-│           node 1              │           │            node 2            │
-└───────────────────────────────┘           └──────────────────────────────┘
-```
 
 ## Getting started
 

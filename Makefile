@@ -5,6 +5,8 @@ cert-dir:
 
 all-certs: server-cert client-cert
 
+# Create our own trusted CA. Well, HAProxy will trust it in the configuration
+# files in this repository anyway.
 ca-cert: cert-dir
 	# openssl genrsa -out ./certs/ca.key 4096
 	openssl req \
@@ -13,6 +15,7 @@ ca-cert: cert-dir
 		-subj "/C=/ST=/L=/O=/CN=foo-ca.dx13.co.uk" \
 		-keyout ./certs/ca.key -out ./certs/ca.crt
 
+# Create certificate for proxy-server.cfg which is signed by the CA
 server-cert: cert-dir ca-cert
 	openssl genrsa -out ./certs/server.key 4096
 	openssl req -new \
@@ -27,6 +30,7 @@ server-cert: cert-dir ca-cert
 	cat ./certs/server.crt >> ./certs/server.pem
 	rm ./certs/server.key ./certs/server.crt ./certs/server.csr
 
+# Create certificate for proxy-client.cfg which is signed by the CA
 client-cert: cert-dir ca-cert
 	openssl genrsa -out ./certs/client.key 4096
 	openssl req -new -key ./certs/client.key -out ./certs/client.csr \

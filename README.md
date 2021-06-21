@@ -14,7 +14,7 @@ the server's HAProxy sidecar, which connects to the server:
 │                               │           │                              │
 │ ┌────────┐      ┌────────────┬┤           ├┬────────────┐      ┌───────┐ │
 │ │ go     │:8080 │            ││  :8081    ││            │:3000 │go     │ │
-│ │ client ├─────►│client-proxy│┼───────────┼│server-proxy├─────►│server │ │
+│ │ client ├─────►│proxy-client│┼───────────┼│proxy-server├─────►│server │ │
 │ │        │      │            ││  secure   ││            │      │       │ │
 │ └────────┘      └────────────┴┤  TLS 1.3+ ├┴────────────┘      └───────┘ │
 │                               │  channel  │                              │
@@ -35,10 +35,10 @@ happen to know HAProxy best.
 
 The main files are:
 
-- `client-proxy.cfg` shows a HAProxy configuration using a `server` line which
+- `proxy-client.cfg` shows a HAProxy configuration using a `server` line which
     creates a TLS connection to the server proxy, presenting a certificate
     for authentication.
-- `server-proxy.cfg` shows a HAProxy configuration using a `bind` line which
+- `proxy-server.cfg` shows a HAProxy configuration using a `bind` line which
     receives a TLS connection to the client proxy, presenting a certificate
     for authentication.
 - `main.go` contains a simple client and server to demonstrate the proxy in use.
@@ -78,13 +78,13 @@ go run . --mode server --port 3000
 Next, start the server HAProxy:
 
 ```
-haproxy -f server-proxy.cfg
+haproxy -f proxy-server.cfg
 ```
 
 Next, the client HAProxy:
 
 ```
-haproxy -f client-proxy.cfg
+haproxy -f proxy-client.cfg
 ```
 
 Neither of the `haproxy` invocations should print output.

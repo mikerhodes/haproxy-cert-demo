@@ -90,3 +90,19 @@ Finally, run the Go client application:
 
 ```
 go run . --mode client --port 8080
+```
+
+## Troubleshooting
+
+Errors when starting HAProxy that contain `DOWN`:
+
+```
+[WARNING]  (73233) : Server client/s1 is DOWN, reason: Layer4 connection problem, info: "Connection refused", check duration: 0ms. 0 active and 0 backup servers left. 0 sessions active, 0 requeued, 0 remaining in queue.
+```
+
+What this means:
+
+- From the client HAProxy, this means you started the client HAProxy before
+    starting the server HAProxy.
+- From the server HAProxy, this means you started the server HAProxy before
+    starting the Go server application.

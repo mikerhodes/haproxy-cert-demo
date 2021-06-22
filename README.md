@@ -1,4 +1,4 @@
-# Mutual certificate authentication using HAProxy sidecars
+# Secure communication channels using HAProxy sidecars
 
 This repository is meant to demonstrate the concept of using a proxy to create a
 secure channel. It shows how to use HAProxy to create a secure (encrypted and
